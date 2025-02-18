@@ -1,0 +1,8 @@
+*
+!cong
+!cong/*.py
+!.gitignore
+!pyproject.toml
+!uv.lock
+!README.md
+!.python-version
