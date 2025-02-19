@@ -39,7 +39,11 @@ client = CongressV3Client(api_key=api_key)
 
 ### call one of the packaged endpoints
 
-noms = client.hearing.get_hearings_by_congress(117, limit=10) # returns a list of Nominations
+noms = client.hearing.get_hearings_by_congress(117, limit=10) # returns a list of Hearings
 noms[0].citation
 >>> 'PN1204'
 ```
+
+### Contributing
+
+Rules forthcoming.
