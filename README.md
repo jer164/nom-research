@@ -43,3 +43,7 @@ noms = client.hearing.get_hearings_by_congress(117, limit=10) # returns a list o
 noms[0].citation
 >>> 'PN1204'
 ```
+
+### Contributing
+
+Rules forthcoming.
