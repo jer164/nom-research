@@ -24,11 +24,12 @@ jobs:
           python-version: '3.13'
 
       # ADJUST THIS: install all dependencies (including pdoc)
-      - run: pip install uv
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
       - run: uv sync
-      # ADJUST THIS: build your documentation into docs/.
-      # We use a custom build script for pdoc itself, ideally you just run `pdoc -o docs/ ...` here.
-      - run: pdoc -o docs/ cong
+      - run: uv run pdoc -o docs/ cong
 
       - uses: actions/upload-pages-artifact@v3
         with:
