@@ -145,7 +145,7 @@ class CongressAPI:
         response.raise_for_status()
         return response.json()
 
-    def _get_aysnc(self, api_urls: list[str], **kwargs) -> str:
+    def _get_async(self, api_urls: list[str], **kwargs) -> str:
         rs = (grequests.get(url=url, params=self.build_params(**kwargs), timeout=200) for url in api_urls)
         reqs = grequests.map(rs, size=5)
         return [r.json() for r in reqs]
@@ -154,7 +154,6 @@ class CongressAPI:
         if isinstance(data[return_type.json_key], list):
             return [return_type.from_json(item) for item in data[return_type.json_key]]
         return [return_type.from_json(data[return_type.json_key])]
-
 
     def _fetch(self, url: str, return_type: CongressResponseBase, **kwargs) -> list[CongressResponseBase]:
         """
@@ -187,10 +186,9 @@ class CongressAPI:
 
         """
         self.logger.info("Sending request...")
-        data = self._get_aysnc(api_urls=urls, **kwargs)
+        data = self._get_async(api_urls=urls, **kwargs)
         nested_resp = [self._parse_response(d, return_type) for d in data]
         return list(itertools.chain(*nested_resp))
-
 
 
 class NominationAPI(CongressAPI, HasSubDirectories):

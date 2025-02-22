@@ -73,16 +73,6 @@ class Hearing(CongressResponseBase):
 
     json_key: ClassVar[str] = field(default="hearings", init=False, repr=False)
 
-    @classmethod
-    def from_json(cls, data: dict) -> Hearing:
-        return cls(
-            chamber=data["chamber"],
-            congress=data["congress"],
-            jacket_number=data["jacketNumber"],
-            update_date=datetime.strptime(data["updateDate"], "%Y-%m-%dT%H:%M:%SZ").astimezone(EST_TZ),
-            url=data["url"],
-        )
-
 
 @dataclass
 class _HearingFromNomination(CongressResponseBase):
