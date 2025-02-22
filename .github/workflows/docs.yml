@@ -31,6 +31,9 @@ jobs:
       - run: uv sync
       - run: uv run pdoc -o docs/ cong
 
+      - name: Run Ruff
+        run: uv run ruff format 
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs/
