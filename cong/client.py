@@ -7,7 +7,9 @@ Classes:
 
 from functools import cached_property
 
-from cong.api import HearingAPI, NominationAPI
+from cong.api.hearing import HearingAPI
+from cong.api.nomination import NominationAPI
+from cong.api.member import MemberAPI
 
 
 class CongressV3Client:
@@ -50,3 +52,14 @@ class CongressV3Client:
 
         """
         return HearingAPI(api_key=self._api_key)
+    
+    @cached_property
+    def member(self) -> 'MemberAPI':
+        """
+        Provides access to the MemberAPI.
+
+        Returns:
+            MemberAPI: An instance of the MemberAPI.
+
+        """
+        return MemberAPI(api_key=self._api_key)

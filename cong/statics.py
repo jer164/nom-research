@@ -2,16 +2,13 @@ import os
 from enum import Enum
 
 import pytz
-from dotenv import load_dotenv
 from pyspark.sql import SparkSession
 
 spark = SparkSession.builder.getOrCreate()
 
-load_dotenv()
-
 EST_TZ = pytz.timezone("US/Eastern")
 
-URL_BASE = os.getenv("CONGRESS_V3_API_BASE")
+URL_BASE = "https://api.congress.gov/v3"
 
 
 def log_template(name: str):
@@ -21,7 +18,8 @@ def log_template(name: str):
     logger.propagate = False
     logger.setLevel(logging.INFO)
     formatter = logging.Formatter(
-        fmt="[%(asctime)s | %(name)s] %(levelname)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+        fmt="[%(asctime)s | %(name)s] %(levelname)s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)
