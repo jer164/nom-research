@@ -4,9 +4,11 @@
 name: nom-research
 
 on: [pull_request]
+on: [pull_request]
 
 jobs:
   build:
+    name: python
     name: python
     runs-on: ubuntu-latest
 
@@ -23,7 +25,13 @@ jobs:
       with:
         python-version-file: "pyproject.toml"
 
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version-file: "pyproject.toml"
+
     - name: Install project
+      run: uv sync --locked --all-groups
       run: uv sync --locked --all-groups
     
     - name: Run ruff format
@@ -39,4 +47,5 @@ jobs:
         args: check --fix --show-fixes
         
     - name: Test with pytest
+      run: uv run pytest -vv --cov=cong
       run: uv run pytest -vv --cov=cong

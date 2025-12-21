@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
-from typing import ClassVar
 from datetime import datetime
+from typing import ClassVar
+
+import requests
 
 from cong.models.congress_base import CongressResponseBase
 
@@ -56,8 +58,6 @@ class DetailedHearing(CongressResponseBase):
 
     @property
     def hearing_text(self) -> str:
-        import requests
-
         txt_url = next((t.url for t in self.formats if t.type == "Formatted Text"), None)
         if txt_url is not None:
             response = requests.get(txt_url, timeout=200)

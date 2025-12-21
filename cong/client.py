@@ -8,8 +8,8 @@ Classes:
 from functools import cached_property
 
 from cong.api.hearing import HearingAPI
-from cong.api.nomination import NominationAPI
 from cong.api.member import MemberAPI
+from cong.api.nomination import NominationAPI
 
 
 class CongressV3Client:

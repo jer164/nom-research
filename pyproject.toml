@@ -12,6 +12,7 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "pytz>=2025.1",
     "requests>=2.32.3",
+    "ruff>=0.14.10",
     "us>=3.2.0",
 ]
 
@@ -22,6 +23,7 @@ analysis-tools = [
 ]
 dev = [
     "ipykernel>=6.29.5",
+    "pre-commit>=4.5.1",
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
 ]
@@ -66,6 +68,9 @@ lint.ignore = [
     "TD002",
     "TD003",
     "FIX002", # too verbose descriptions of todos
+    "FBT001", # need booleans in query params, will fix later
+    "FBT002", 
+    "PLR0913" # too many arguments in some functions
 ]
 line-length = 120
 target-version = "py311"

@@ -1,8 +1,8 @@
 from typing import ClassVar
 
+from cong.api.api import CongressAPI, HasSubDirectories
 from cong.models.hearing import DetailedHearing, Hearing
 from cong.statics import BaseEndpoints
-from cong.api.api import CongressAPI, HasSubDirectories
 
 
 class HearingAPI(CongressAPI, HasSubDirectories):
@@ -62,6 +62,7 @@ class HearingAPI(CongressAPI, HasSubDirectories):
             chamber (str): The chamber of Congress ('house' or 'senate').
             offset (int, optional): The starting point for the list of hearings. Defaults to 0.
             limit (int, optional): The maximum number of hearings to return. Defaults to 100.
+
         Returns:
             list[Hearing]: A list of Hearing objects.
 
@@ -72,32 +73,38 @@ class HearingAPI(CongressAPI, HasSubDirectories):
             offset=offset,
             limit=limit,
         )
-    
+
     def get_detail_from_hearing(self, hearing: Hearing) -> DetailedHearing:
         """
         Retrieve detailed information for a specific hearing.
 
         Args:
             hearing (Hearing): The Hearing object for which to retrieve details.
-        
+
         Returns:
             DetailedHearing: A DetailedHearing object with detailed information.
+
         """
         return self._fetch(
             self.build_url_from_values(hearing.congress, hearing.chamber.lower(), hearing.jacket_number),
             return_type=DetailedHearing,
         )
-    
+
     def get_details_from_hearings(self, hearings: list[Hearing]) -> list[DetailedHearing]:
         """
         Retrieve detailed information for a list of hearings.
 
         Args:
             hearings (list[Hearing]): A list of Hearing objects for which to retrieve details.
+
         Returns:
             list[DetailedHearing]: A list of DetailedHearing objects with detailed information.
+
         """
-        base_urls = [self.build_url_from_values(hearing.congress, hearing.chamber.lower(), hearing.jacket_number) for hearing in hearings]
+        base_urls = [
+            self.build_url_from_values(hearing.congress, hearing.chamber.lower(), hearing.jacket_number)
+            for hearing in hearings
+        ]
         request_list = [
             {
                 "url": base_url,
