@@ -3,32 +3,28 @@
 
 name: nom-research
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   build:
-
+    name: python
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.11"]
 
     steps:
     - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version-file: .python-version
 
     - name: Install uv
       uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
 
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version-file: "pyproject.toml"
+
     - name: Install project
-      run: uv sync --locked --dev
+      run: uv sync --locked --all-groups
     
     - name: Run ruff format
       uses: astral-sh/ruff-action@v3
@@ -43,5 +39,4 @@ jobs:
         args: check --fix --show-fixes
         
     - name: Test with pytest
-      run: |
-        pytest -vv
+      run: uv run pytest -vv --cov=cong

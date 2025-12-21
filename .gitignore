@@ -5,3 +5,4 @@ __pycache__/
 .env
 /*.ipynb
 **/.DS_Store
+.coverage
