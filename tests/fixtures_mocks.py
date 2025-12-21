@@ -1,8 +1,13 @@
 from datetime import datetime
 
 import pytest
+import pytest
 
 from cong.models.member import (
+    AddressInformation,
+    Depiction,
+    DetailedTerm,
+    LegislationInfo,
     AddressInformation,
     Depiction,
     DetailedTerm,
@@ -15,6 +20,7 @@ from cong.models.member import (
     PartyHistory,
     PreviousName,
     Term,
+    Term,
 )
 
 
@@ -25,6 +31,13 @@ def member_fixture():
         name="Bergman, Jack",
         party_name="Republican",
         state="Michigan",
+        terms=[
+            Term(
+                chamber="House of Representatives",
+                start_year=2017,
+                end_year=None,
+            )
+        ],
         terms=[
             Term(
                 chamber="House of Representatives",
@@ -66,6 +79,11 @@ def member_detail_fixture():
         last_name="Dunn",
         middle_name="P.",
         official_website_url="https://dunn.house.gov",
+        party_history=[
+            PartyHistory(
+                party_abbreviation="R", party_name="Republican", start_year=2017
+            )
+        ],
         party_history=[
             PartyHistory(
                 party_abbreviation="R", party_name="Republican", start_year=2017

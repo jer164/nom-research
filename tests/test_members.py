@@ -1,5 +1,7 @@
 from unittest.mock import patch
 
+from unittest.mock import patch
+
 import pytest
 from unittest.mock import patch
 from cong.api.member import MemberAPI
