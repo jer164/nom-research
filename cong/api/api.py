@@ -1,16 +1,15 @@
-
 from __future__ import annotations
 
 import itertools
 from datetime import datetime
-from typing import ClassVar
+from typing import ClassVar, NamedTuple
 
 import grequests
 import pytz
 import requests
 
 from cong.models.congress_base import CongressResponseBase
-from cong.statics import BaseEndpoints, log_template
+from cong.statics import log_template
 
 
 class HasSubDirectories:
@@ -43,6 +42,10 @@ class CongressAPI:
         """
         self._api_key = api_key
         self.logger = log_template(self.__class__.__qualname__)
+
+    def _get_endpoint_max(self, endpoint: str) -> int:
+        response = self._get(endpoint, limit=1)
+        return response["pagination"]["count"]
 
     def build_params(
         self,
@@ -77,7 +80,9 @@ class CongressAPI:
             **kwargs,
         }
 
-    def parse_dates(self, from_date: datetime | str | None, to_date: datetime | str | None) -> dict[str, str]:
+    def parse_dates(
+        self, from_date: datetime | str | None, to_date: datetime | str | None
+    ) -> dict[str, str]:
         """
         Parses the from_date and to_date into the required format.
 
@@ -118,13 +123,33 @@ class CongressAPI:
             list: The JSON response from the API.
 
         """
-        response = requests.get(api_url, params=self.build_params(**kwargs), timeout=200)
+        response = requests.get(
+            api_url, params=self.build_params(**kwargs), timeout=200
+        )
         response.raise_for_status()
         return response.json()
 
-    def _get_async(self, api_urls: list[str], **kwargs) -> str:
-        rs = (grequests.get(url=url, params=self.build_params(**kwargs), timeout=200) for url in api_urls)
-        reqs = grequests.map(rs, size=5)
+    def _build_async_requests(
+        self, base_url: str, max_row_count: int, **kwargs
+    ) -> list[str]:
+        async_requests = []
+        reqs_needed = (max_row_count // 250) + (1 if max_row_count % 250 > 0 else 0)
+        for i in range(reqs_needed):
+            offset = i * 250
+            async_requests.append(
+                {
+                    "url": base_url,
+                    "params": self.build_params(offset=offset, limit=250, **kwargs),
+                }
+            )
+        return async_requests  ### need to make this its own object probably
+
+    def _get_async(self, request_list: list[dict]) -> list[dict]:
+        rs = (
+            grequests.get(url=req["url"], params=req["params"], timeout=30)
+            for req in request_list
+        )
+        reqs = grequests.map(rs, size=25)
         return [r.json() for r in reqs]
 
     def _parse_response(self, data: dict, return_type: CongressResponseBase) -> list:
@@ -132,7 +157,9 @@ class CongressAPI:
             return [return_type.from_json(item) for item in data[return_type.json_key]]
         return [return_type.from_json(data[return_type.json_key])]
 
-    def _fetch(self, url: str, return_type: CongressResponseBase, **kwargs) -> list[CongressResponseBase]:
+    def _fetch(
+        self, url: str, return_type: CongressResponseBase, **kwargs
+    ) -> list[CongressResponseBase]:
         """
         Fetches data from the specified URL.
 
@@ -147,44 +174,14 @@ class CongressAPI:
         """
         self.logger.info("Sending request...")
         data = self._get(url, **kwargs)
+        self.logger.info(
+            f"Request successful; returned {len(data[return_type.json_key])} records."
+        )
         return self._parse_response(data, return_type)
 
-    def _fetch_all(self, url: str, return_type: CongressResponseBase, stop_after: int | None = None, **kwargs) -> list[CongressResponseBase]:
-        """
-        Fetches all data from the specified URL, handling pagination.
-
-        Args:
-            url (str): The URL to fetch data from.
-            return_type (CongressResponseBase): The type of response expected from the query.
-            stop_after (int | None): Maximum number of pages to fetch.
-            **kwargs: Additional parameters for the request.
-        
-        Returns:
-            list: The processed response data.
-
-        """
-        all_data = []
-        page_count = 0
-        next_url = url
-        
-        while next_url and (stop_after is None or page_count < stop_after):
-            page_count += 1
-            
-            if page_count == 1:
-                self.logger.info("Sending initial request...")
-            else:
-                limit = kwargs.get("limit", 100)
-                count = data.get("pagination", {}).get("count", 0)
-                total_pages = (count + limit - 1) // limit
-                self.logger.info(f"Fetching page {page_count}/{total_pages}...")
-            
-            data = self._get(next_url, **kwargs)
-            all_data.extend(self._parse_response(data, return_type))
-            next_url = data.get("pagination", {}).get("next")
-        
-        return all_data
-
-    def _fetch_async(self, urls: list[str], return_type: CongressResponseBase, **kwargs) -> list[CongressResponseBase]:
+    def _fetch_async(
+        self, request_list: list[dict], return_type: CongressResponseBase, **kwargs
+    ) -> list[CongressResponseBase]:
         """
         Fetches data from the specified URL.
 
@@ -197,7 +194,11 @@ class CongressAPI:
             list: The processed response data.
 
         """
-        self.logger.info("Sending request...")
-        data = self._get_async(api_urls=urls, **kwargs)
+        self.logger.info(f"Sending {len(request_list)} requests in parallel.")
+        self.logger.info("Session may timeout if token encounters rate limits.")
+        data = self._get_async(request_list=request_list, **kwargs)
         nested_resp = [self._parse_response(d, return_type) for d in data]
+        self.logger.info(
+            f"All requests successful; returned {sum(len(r) for r in nested_resp)} records."
+        )
         return list(itertools.chain(*nested_resp))

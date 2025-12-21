@@ -17,7 +17,7 @@ class Hearing(CongressResponseBase):
 
 
 @dataclass
-class _HearingFromNomination(CongressResponseBase):
+class HearingFromNomination(CongressResponseBase):
     chamber: str
     citation: str
     date: datetime

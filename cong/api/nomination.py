@@ -3,7 +3,7 @@ from typing import ClassVar
 
 
 from cong.api.api import HasSubDirectories, CongressAPI
-from cong.models.hearing import _HearingFromNomination, DetailedHearing, Hearing
+from cong.models.hearing import HearingFromNomination, DetailedHearing, Hearing
 from cong.models.nomination import Nomination
 from cong.statics import BaseEndpoints
 
@@ -96,7 +96,7 @@ class NominationAPI(CongressAPI, HasSubDirectories):
         nomination_no: int,
         offset: int = 0,
         limit: int = 100,
-    ) -> list[_HearingFromNomination]:
+    ) -> list[HearingFromNomination]:
         """
         Fetches nominations by Congress from the API.
 
@@ -112,18 +112,16 @@ class NominationAPI(CongressAPI, HasSubDirectories):
         """
         return self._fetch(
             self.build_url_from_values(congress, nomination_no, "hearings"),
-            return_type=_HearingFromNomination,
+            return_type=HearingFromNomination,
             offset=offset,
             limit=limit,
         )
 
+    ### Needs to be updated to use new async methods
     def get_hearings_from_nomination_list(
         self,
-        congress: int,
         nominations: list[Nomination],
-        offset: int = 0,
-        limit: int = 100,
-    ) -> list[_HearingFromNomination]:
+    ) -> list[HearingFromNomination]:
         """
         Fetches nominations by Congress from the API.
 
@@ -137,12 +135,15 @@ class NominationAPI(CongressAPI, HasSubDirectories):
             list[Nomination]: The list of nominations.
 
         """
+        base_urls = [self.build_url_from_values(nom.congress, nom.number, "hearings") for nom in nominations]
+        request_list = [
+            {
+                "url": base_url,
+                "params": self.build_params(),
+            }
+            for base_url in base_urls
+        ]
         return self._fetch_async(
-            [
-                self.build_url_from_values(congress, nom.number, "hearings")
-                for nom in nominations
-            ],
-            return_type=_HearingFromNomination,
-            offset=offset,
-            limit=limit,
+            request_list,
+            return_type=HearingFromNomination,
         )
