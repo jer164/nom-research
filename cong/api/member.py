@@ -36,7 +36,7 @@ class MemberAPI(CongressAPI, HasSubDirectories):
         to_date: datetime | str | None = None,
         limit: int = 100,
         current_member: bool = True,
-        retrive_all: bool = False,
+        retrieve_all: bool = False,
     ) -> list[Member]:
         """
         Fetches Members from the API.
@@ -52,7 +52,7 @@ class MemberAPI(CongressAPI, HasSubDirectories):
             list[Member]: The list of Members.
 
         """
-        if retrive_all:
+        if retrieve_all:
             return self._get_all_members(
                 from_date=from_date,
                 to_date=to_date,
@@ -74,7 +74,7 @@ class MemberAPI(CongressAPI, HasSubDirectories):
         offset: int = 0,
         limit: int = 100,
         current_member: bool = True,
-        retrive_all: bool = False,
+        retrieve_all: bool = False,
     ) -> list[Member]:
         """
         Fetches Members by Congress from the API.
@@ -89,7 +89,7 @@ class MemberAPI(CongressAPI, HasSubDirectories):
         Returns:
             list[Member]: The list of Members.
         """
-        if retrive_all:
+        if retrieve_all:
             max_rows = self._get_endpoint_max(
                 self.build_url_from_values("congress", congress)
             )
