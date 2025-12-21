@@ -30,10 +30,17 @@ jobs:
     - name: Install project
       run: uv sync --locked --dev
     
-    - name: Run linter
+    - name: Run ruff format
       uses: astral-sh/ruff-action@v3
       with:
         src: "./cong"
+        args: format 
+    
+    - name: Run ruff lint
+      uses: astral-sh/ruff-action@v3
+      with:
+        src: "./cong"
+        args: check --fix --show-fixes
         
     - name: Test with pytest
       run: |
