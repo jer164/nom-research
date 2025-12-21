@@ -7,7 +7,7 @@ from cong.api.api import HasSubDirectories, CongressAPI
 from cong.models.member import Member, MemberDetail, SponsoredLegislation, CosponsoredLegislation
 from cong.statics import BaseEndpoints
 
-# Maximum valid U.S. Congressional district number
+# Maximum valid U.S. Congressional district number (including at-large districts)
 MAX_DISTRICT_NUMBER = 52
 
 
