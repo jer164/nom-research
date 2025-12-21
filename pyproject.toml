@@ -24,6 +24,7 @@ analysis-tools = [
 dev = [
     "ipykernel>=6.29.5",
     "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
 ]
 
 [tool.pyright]
@@ -31,8 +32,6 @@ typeCheckingMode = "off"
 
 [tool.ruff]
 lint.fixable = ["ALL"]
-line-length = 120
-target-version = "py311"
 lint.select = [
     "ALL", # include all the rules, including new ones
 ]
@@ -72,6 +71,8 @@ lint.ignore = [
     "FBT002", 
     "PLR0913" # too many arguments in some functions
 ]
+line-length = 120
+target-version = "py311"
 include = ["cong/**/*.py"]
 [tool.ruff.format]
 docstring-code-format = true

@@ -3,7 +3,7 @@
 
 name: nom-research
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   build:
@@ -43,5 +43,4 @@ jobs:
         args: check --fix --show-fixes
         
     - name: Test with pytest
-      run: |
-        pytest -vv
+      run: uv run pytest -vv --cov=cong
