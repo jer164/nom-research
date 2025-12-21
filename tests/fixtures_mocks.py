@@ -1,18 +1,18 @@
-import pytest
 from datetime import datetime
 
+import pytest
 
 from cong.models.member import (
-    Member,
-    MemberDetail,
-    Terms,
-    Term,
-    Depiction,
     AddressInformation,
-    PartyHistory,
-    PreviousName,
+    Depiction,
     DetailedTerm,
     LegislationInfo,
+    Member,
+    MemberDetail,
+    PartyHistory,
+    PreviousName,
+    Term,
+    Terms,
 )
 
 

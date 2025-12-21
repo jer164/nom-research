@@ -2,14 +2,16 @@ from __future__ import annotations
 
 import itertools
 from datetime import datetime
-from typing import ClassVar, NamedTuple
+from typing import TYPE_CHECKING, ClassVar
 
 import grequests
 import pytz
 import requests
 
-from cong.models.congress_base import CongressResponseBase
 from cong.statics import log_template
+
+if TYPE_CHECKING:
+    from cong.models.congress_base import CongressResponseBase
 
 
 class HasSubDirectories:
@@ -125,8 +127,8 @@ class CongressAPI:
         response.raise_for_status()
         return response.json()
 
-    ## TODO: Refactor this so it can processes cases where the base_url 
-    ## has different parameters. Currently assumes same paths. 
+    ## TODO: Refactor this so it can processes cases where the base_url
+    ## has different parameters. Currently assumes same paths.
     def _build_async_requests(self, base_url: str, max_row_count: int, **kwargs) -> list[str]:
         async_requests = []
         reqs_needed = (max_row_count // 250) + (1 if max_row_count % 250 > 0 else 0)
@@ -165,7 +167,7 @@ class CongressAPI:
         """
         self.logger.info("Sending request...")
         data = self._get(url, **kwargs)
-        self.logger.info(f"Request successful; returned {len(data[return_type.json_key])} records.")
+        self.logger.info("Request successful; returned %d records.", len(data[return_type.json_key]))
         return self._parse_response(data, return_type)
 
     def _fetch_async(
@@ -175,7 +177,7 @@ class CongressAPI:
         Fetches data from the specified URL.
 
         Args:
-            urls (list[str]): The list of URLs to fetch data from.
+            request_list (list[dict]): The list of requests to send.
             return_type (CongressResponseBase): The type of response expected from the query.
             **kwargs: Additional parameters for the request.
 
@@ -183,9 +185,9 @@ class CongressAPI:
             list: The processed response data.
 
         """
-        self.logger.info(f"Sending {len(request_list)} requests in parallel.")
+        self.logger.info("Sending %d requests in parallel.", len(request_list))
         self.logger.info("Session may timeout if token encounters rate limits.")
         data = self._get_async(request_list=request_list, **kwargs)
         nested_resp = [self._parse_response(d, return_type) for d in data]
-        self.logger.info(f"All requests successful; returned {sum(len(r) for r in nested_resp)} records.")
+        self.logger.info("All requests successful; returned %d records.", sum(len(r) for r in nested_resp))
         return list(itertools.chain(*nested_resp))

@@ -1,7 +1,6 @@
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import ClassVar
-
-from dataclasses import dataclass, field
 
 from cong.models.congress_base import CongressResponseBase
 from cong.statics import EST_TZ

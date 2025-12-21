@@ -3,8 +3,8 @@ from typing import ClassVar
 
 from us import states
 
-from cong.api.api import HasSubDirectories, CongressAPI
-from cong.models.member import Member, MemberDetail, SponsoredLegislation, CosponsoredLegislation
+from cong.api.api import CongressAPI, HasSubDirectories
+from cong.models.member import CosponsoredLegislation, Member, MemberDetail, SponsoredLegislation
 from cong.statics import BaseEndpoints
 
 MAX_DISTRICT_NUMBER = 52
@@ -25,6 +25,7 @@ class MemberAPI(CongressAPI, HasSubDirectories):
     def __init__(self, api_key: str):
         """
         Initializes the MemberAPI with the provided API key.
+
         Args:
             api_key (str): The API key for authenticating requests.
 
@@ -49,6 +50,7 @@ class MemberAPI(CongressAPI, HasSubDirectories):
             to_date (datetime | str | None): The end date for filtering results.
             limit (int): The maximum number of results to return.
             current_member (bool): Whether to filter for current members only.
+            retrieve_all (bool): Whether to retrieve all members without pagination.
 
         Returns:
             list[Member]: The list of Members.
@@ -88,8 +90,11 @@ class MemberAPI(CongressAPI, HasSubDirectories):
             to_date (datetime | str | None): The end date for filtering results.
             limit (int): The maximum number of results to return.
             current_member (bool): Whether to filter for current members only.
+            retrieve_all (bool): Whether to retrieve all members without pagination.
+
         Returns:
             list[Member]: The list of Members.
+
         """
         if retrieve_all:
             max_rows = self._get_endpoint_max(self.build_url_from_values("congress", congress))
@@ -117,8 +122,10 @@ class MemberAPI(CongressAPI, HasSubDirectories):
 
         Args:
             member (Member): The Member object.
+
         Returns:
             MemberDetail: The detailed information of the Member.
+
         """
         return self._fetch(
             self.build_url_from_values(member.bioguide_id),
@@ -131,8 +138,12 @@ class MemberAPI(CongressAPI, HasSubDirectories):
 
         Args:
             member (Member): The Member object.
+            limit (int): The maximum number of results to return.
+            offset (int): The offset for pagination.
+
         Returns:
             SponsoredLegislation: The sponsored legislation information.
+
         """
         return self._fetch(
             self.build_url_from_values(member.bioguide_id, "sponsored-legislation"),
@@ -147,8 +158,12 @@ class MemberAPI(CongressAPI, HasSubDirectories):
 
         Args:
             member (Member): The Member object.
+            limit (int): The maximum number of results to return.
+            offset (int): The offset for pagination.
+
         Returns:
             CosponsoredLegislation: The cosponsored legislation information.
+
         """
         return self._fetch(
             self.build_url_from_values(member.bioguide_id, "cosponsored-legislation"),
@@ -165,10 +180,14 @@ class MemberAPI(CongressAPI, HasSubDirectories):
 
         Args:
             state (str): The state abbreviation or state name.
+            current_member (bool): Whether to filter for current members only.
+            offset (int): The offset for pagination.
+            limit (int): The maximum number of results to return.
+
         Returns:
             list[Member]: The list of Members from the specified state.
-        """
 
+        """
         state_code = states.lookup(state).abbr
         return self._fetch(
             self.build_url_from_values(state_code),
@@ -187,11 +206,17 @@ class MemberAPI(CongressAPI, HasSubDirectories):
         Args:
             state (str): The state abbreviation or state name.
             district (int): The district number.
+            current_member (bool): Whether to filter for current members only.
+            offset (int): The offset for pagination.
+            limit (int): The maximum number of results to return.
+
         Returns:
             list[Member]: The list of Members from the specified state and district.
+
         """
-        if district > 52 or district < 0:
-            raise ValueError("Invalid district number. Must be between 0 and 52.")
+        if district > MAX_DISTRICT_NUMBER or district < 0:
+            msg = "Invalid district number. Must be between 0 and 52."
+            raise ValueError(msg)
         state_code = states.lookup(state).abbr
         return self._fetch(
             self.build_url_from_values(state_code, district),
@@ -211,11 +236,17 @@ class MemberAPI(CongressAPI, HasSubDirectories):
             congress (int): The Congress number.
             state (str): The state abbreviation or state name.
             district (int): The district number.
+            limit (int): The maximum number of results to return.
+            current_member (bool): Whether to filter for current members only.
+            offset (int): The offset for pagination.
+
         Returns:
             list[Member]: The list of Members from the specified congress, state and district.
+
         """
         if district > MAX_DISTRICT_NUMBER or district < 0:
-            raise ValueError(f"Invalid district number. Must be between 0 and {MAX_DISTRICT_NUMBER}.")
+            msg = f"Invalid district number. Must be between 0 and {MAX_DISTRICT_NUMBER}."
+            raise ValueError(msg)
         state_code = states.lookup(state).abbr
         return self._fetch(
             self.build_url_from_values("congress", congress, state_code, district),
@@ -234,12 +265,13 @@ class MemberAPI(CongressAPI, HasSubDirectories):
         """
             Fetches all Members from the API.
 
-            Args:
+        Args:
                 from_date (datetime | str | None): The start date for filtering results.
                 to_date (datetime | str | None): The end date for filtering results.
                 current_member (bool): Whether to filter for current members only.
         )
-            Returns:
+
+        Returns:
                 list[Member]: The list of Members.
 
         """

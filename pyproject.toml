@@ -12,6 +12,7 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "pytz>=2025.1",
     "requests>=2.32.3",
+    "ruff>=0.14.10",
     "us>=3.2.0",
 ]
 
@@ -66,6 +67,9 @@ lint.ignore = [
     "TD002",
     "TD003",
     "FIX002", # too verbose descriptions of todos
+    "FBT001", # need booleans in query params, will fix later
+    "FBT002", 
+    "PLR0913" # too many arguments in some functions
 ]
 exclude  = ["scratchpad.ipynb", "testing.ipynb"]
 [tool.ruff.format]

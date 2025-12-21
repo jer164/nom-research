@@ -16,8 +16,6 @@ class Term(JsonSerializable):
     chamber: str
     start_year: int | None = None
     end_year: int | None = None
-    # start: int | None = None
-    # end: int | None = None
 
 
 @dataclass
@@ -84,9 +82,9 @@ class Member(CongressResponseBase):
         if isinstance(self.update_date, str):
             self.update_date = self.format_ts(self.update_date)
         if self.depiction is not None and isinstance(self.depiction, dict):
-            self.depiction = Depiction.from_json(self.depiction) # type: ignore
+            self.depiction = Depiction.from_json(self.depiction)
         if isinstance(self.terms, dict):
-            self.terms = [Term.from_json(t) for t in self.terms["item"]] # type: ignore
+            self.terms = [Term.from_json(t) for t in self.terms["item"]]
 
 
 @dataclass

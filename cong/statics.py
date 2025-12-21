@@ -1,3 +1,4 @@
+import logging
 from enum import Enum
 
 import pytz
@@ -8,8 +9,6 @@ URL_BASE = "https://api.congress.gov/v3"
 
 
 def log_template(name: str):
-    import logging
-
     logger = logging.getLogger(name)
     logger.propagate = False
     logger.setLevel(logging.INFO)
