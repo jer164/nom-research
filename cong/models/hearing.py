@@ -4,6 +4,7 @@ from datetime import datetime
 
 from cong.models.congress_base import CongressResponseBase
 
+
 @dataclass
 class Hearing(CongressResponseBase):
     chamber: str
@@ -56,6 +57,7 @@ class DetailedHearing(CongressResponseBase):
     @property
     def hearing_text(self) -> str:
         import requests
+
         txt_url = next((t.url for t in self.formats if t.type == "Formatted Text"), None)
         if txt_url is not None:
             response = requests.get(txt_url, timeout=200)

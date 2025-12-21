@@ -48,9 +48,7 @@ class TestMemberAPI:
     @patch.object(MemberAPI, "_fetch_async")
     @patch.object(MemberAPI, "_build_async_requests")
     @patch.object(MemberAPI, "_get_endpoint_max")
-    def test_get_members_by_congress_retrieve_all(
-        self, mock_max, mock_build, mock_fetch_async, member_api
-    ):
+    def test_get_members_by_congress_retrieve_all(self, mock_max, mock_build, mock_fetch_async, member_api):
         mock_max.return_value = 250
         mock_build.return_value = ["url1", "url2"]
         mock_fetch_async.return_value = [member_fixture]
@@ -69,9 +67,7 @@ class TestMemberAPI:
         assert isinstance(result, MemberDetail)
 
     @patch.object(MemberAPI, "_fetch")
-    def test_get_sponsored_legislation_from_member(
-        self, mock_fetch, member_api, member_fixture
-    ):
+    def test_get_sponsored_legislation_from_member(self, mock_fetch, member_api, member_fixture):
         mock_fetch.return_value = {}
         result = member_api.get_sponsored_legislation_from_member(member_fixture)
 
@@ -79,9 +75,7 @@ class TestMemberAPI:
         assert isinstance(result, dict)
 
     @patch.object(MemberAPI, "_fetch")
-    def test_get_cosponsored_legislation_from_member(
-        self, mock_fetch, member_api, member_fixture
-    ):
+    def test_get_cosponsored_legislation_from_member(self, mock_fetch, member_api, member_fixture):
         mock_fetch.return_value = {}
         result = member_api.get_cosponsored_legislation_from_member(member_fixture)
 
@@ -114,18 +108,14 @@ class TestMemberAPI:
     @patch.object(MemberAPI, "_fetch")
     def test_get_members_by_congress_state_and_district(self, mock_fetch, member_api):
         mock_fetch.return_value = [member_fixture]
-        result = member_api.get_members_by_congress_state_and_district(
-            congress=117, state="CA", district=1
-        )
+        result = member_api.get_members_by_congress_state_and_district(congress=117, state="CA", district=1)
 
         mock_fetch.assert_called_once()
         assert len(result) == 1
 
     def test_get_members_by_congress_state_and_district_invalid(self, member_api):
         with pytest.raises(ValueError, match="Invalid district number"):
-            member_api.get_members_by_congress_state_and_district(
-                congress=117, state="CA", district=100
-            )
+            member_api.get_members_by_congress_state_and_district(congress=117, state="CA", district=100)
 
     @patch.object(MemberAPI, "_fetch_async")
     @patch.object(MemberAPI, "_build_async_requests")

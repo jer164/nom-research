@@ -24,9 +24,7 @@ class Nomination(CongressResponseBase):
     json_key: ClassVar[str] = field(default="nominations", init=False, repr=False)
 
     def __post_init__(self):
-        self.update_date = datetime.strptime(
-            self.update_date, "%Y-%m-%dT%H:%M:%SZ"
-        ).astimezone(EST_TZ)
+        self.update_date = datetime.strptime(self.update_date, "%Y-%m-%dT%H:%M:%SZ").astimezone(EST_TZ)
         self.received_date = (
             datetime.strptime(self.received_date, "%Y-%m-%d").astimezone(EST_TZ)
             if self.received_date
