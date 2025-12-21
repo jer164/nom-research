@@ -125,6 +125,8 @@ class CongressAPI:
         response.raise_for_status()
         return response.json()
 
+    ## TODO: Refactor this so it can processes cases where the base_url 
+    ## has different parameters. Currently assumes same paths. 
     def _build_async_requests(self, base_url: str, max_row_count: int, **kwargs) -> list[str]:
         async_requests = []
         reqs_needed = (max_row_count // 250) + (1 if max_row_count % 250 > 0 else 0)

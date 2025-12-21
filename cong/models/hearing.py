@@ -36,7 +36,6 @@ class HearingTranscript:
 
 @dataclass
 class DetailedHearing(CongressResponseBase):
-    number: int
     chamber: str
     citation: str
     committees: list
@@ -47,6 +46,7 @@ class DetailedHearing(CongressResponseBase):
     library_of_congress_identifier: str
     title: str
     update_date: datetime
+    number: int | None = None
     associated_meeting: dict = field(default_factory=dict)
 
     json_key: ClassVar[str] = field(default="hearing", init=False, repr=False)
