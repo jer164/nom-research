@@ -23,6 +23,7 @@ analysis-tools = [
 ]
 dev = [
     "ipykernel>=6.29.5",
+    "pre-commit>=4.5.1",
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
 ]
