@@ -51,12 +51,6 @@ class AddressInformation(JsonSerializable):
 
 
 @dataclass
-class Depiction(JsonSerializable):
-    attribution: str
-    image_url: str
-
-
-@dataclass
 class PartyHistory(JsonSerializable):
     party_abbreviation: str
     party_name: str
@@ -128,32 +122,40 @@ class MemberDetail(CongressResponseBase):
     district: int | None = None
 
     json_key: ClassVar[str] = field(default="member", init=False, repr=False)
-    
+
     ## TODO: Refactor __post_init__ to reduce repetition across the codebase
     ## Likely need to make a utility function in congress_base.py to handle this pattern
     def __post_init__(self):
-        
+
         if isinstance(self.update_date, str):
             self.update_date = self.format_ts(self.update_date)
-        
+
         if isinstance(self.address_information, dict):
-            self.address_information = AddressInformation.from_json(self.address_information)
-        
+            self.address_information = AddressInformation.from_json(
+                self.address_information
+            )
+
         if isinstance(self.depiction, dict):
             self.depiction = Depiction.from_json(self.depiction)
-        
+
         if isinstance(self.cosponsored_legislation, dict):
-            self.cosponsored_legislation = LegislationInfo.from_json(self.cosponsored_legislation)
-        
+            self.cosponsored_legislation = LegislationInfo.from_json(
+                self.cosponsored_legislation
+            )
+
         if isinstance(self.sponsored_legislation, dict):
-            self.sponsored_legislation = LegislationInfo.from_json(self.sponsored_legislation)
-        
+            self.sponsored_legislation = LegislationInfo.from_json(
+                self.sponsored_legislation
+            )
+
         if self.party_history and isinstance(self.party_history[0], dict):
             self.party_history = [PartyHistory.from_json(p) for p in self.party_history]
-        
+
         if self.previous_names and isinstance(self.previous_names[0], dict):
-            self.previous_names = [PreviousName.from_json(p) for p in self.previous_names]
-        
+            self.previous_names = [
+                PreviousName.from_json(p) for p in self.previous_names
+            ]
+
         if self.terms and isinstance(self.terms[0], dict):
             self.terms = [DetailedTerm.from_json(t) for t in self.terms]
 
@@ -164,10 +166,12 @@ class LatestAction(JsonSerializable):
     text: str
     action_time: str | None = None
 
+
 ##TODO: Create enum for policy areas
 @dataclass
 class PolicyArea(JsonSerializable):
     name: str
+
 
 @dataclass
 class SponsoredLegislation(CongressResponseBase):
@@ -181,7 +185,9 @@ class SponsoredLegislation(CongressResponseBase):
     number: str | None = None
     amendment_number: str | None = None
 
-    json_key: ClassVar[str] = field(default="sponsoredLegislation", init=False, repr=False)
+    json_key: ClassVar[str] = field(
+        default="sponsoredLegislation", init=False, repr=False
+    )
 
     def __post_init__(self):
         if isinstance(self.latest_action, dict):
@@ -189,6 +195,9 @@ class SponsoredLegislation(CongressResponseBase):
         if self.policy_area is not None and isinstance(self.policy_area, dict):
             self.policy_area = PolicyArea.from_json(self.policy_area)
 
+
 @dataclass
 class CosponsoredLegislation(SponsoredLegislation):
-    json_key: ClassVar[str] = field(default="cosponsoredLegislation", init=False, repr=False)
+    json_key: ClassVar[str] = field(
+        default="cosponsoredLegislation", init=False, repr=False
+    )
