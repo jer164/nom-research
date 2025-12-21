@@ -92,9 +92,7 @@ class MemberAPI(CongressAPI, HasSubDirectories):
             list[Member]: The list of Members.
         """
         if retrieve_all:
-            max_rows = self._get_endpoint_max(
-                self.build_url_from_values("congress", congress)
-            )
+            max_rows = self._get_endpoint_max(self.build_url_from_values("congress", congress))
             async_urls = self._build_async_requests(
                 self.build_url_from_values("congress", congress),
                 max_rows,
@@ -127,9 +125,7 @@ class MemberAPI(CongressAPI, HasSubDirectories):
             return_type=MemberDetail,
         )
 
-    def get_sponsored_legislation_from_member(
-        self, member: Member, limit: int = 100, offset: int = 0
-    ) -> dict:
+    def get_sponsored_legislation_from_member(self, member: Member, limit: int = 100, offset: int = 0) -> dict:
         """
         Fetches sponsored legislation for a given Member from the API.
 
@@ -144,10 +140,8 @@ class MemberAPI(CongressAPI, HasSubDirectories):
             limit=limit,
             offset=offset,
         )
-    
-    def get_cosponsored_legislation_from_member(
-        self, member: Member, limit: int = 100, offset: int = 0
-    ) -> dict:
+
+    def get_cosponsored_legislation_from_member(self, member: Member, limit: int = 100, offset: int = 0) -> dict:
         """
         Fetches cosponsored legislation for a given Member from the API.
 
@@ -163,7 +157,9 @@ class MemberAPI(CongressAPI, HasSubDirectories):
             offset=offset,
         )
 
-    def get_members_by_state(self, state: str, limit: int = 100, current_member: bool = True, offset: int = 0) -> list[Member]:
+    def get_members_by_state(
+        self, state: str, limit: int = 100, current_member: bool = True, offset: int = 0
+    ) -> list[Member]:
         """
         Fetches Members by state from the API.
 
@@ -181,8 +177,10 @@ class MemberAPI(CongressAPI, HasSubDirectories):
             limit=limit,
             currentMember=current_member,
         )
-    
-    def get_members_by_state_and_district(self, state: str, district: int, limit: int = 100, current_member: bool = True, offset: int = 0) -> list[Member]:
+
+    def get_members_by_state_and_district(
+        self, state: str, district: int, limit: int = 100, current_member: bool = True, offset: int = 0
+    ) -> list[Member]:
         """
         Fetches Members by state and district from the API.
 
@@ -202,8 +200,10 @@ class MemberAPI(CongressAPI, HasSubDirectories):
             limit=limit,
             currentMember=current_member,
         )
-    
-    def get_members_by_congress_state_and_district(self, congress: int, state: str, district: int, limit: int = 100, current_member: bool = True, offset: int = 0) -> list[Member]:
+
+    def get_members_by_congress_state_and_district(
+        self, congress: int, state: str, district: int, limit: int = 100, current_member: bool = True, offset: int = 0
+    ) -> list[Member]:
         """
         Fetches Members by congress, state and district from the API.
 

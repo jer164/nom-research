@@ -4,6 +4,7 @@ from cong.models.hearing import DetailedHearing, Hearing
 from cong.statics import BaseEndpoints
 from cong.api.api import CongressAPI, HasSubDirectories
 
+
 class HearingAPI(CongressAPI, HasSubDirectories):
     _url: ClassVar[str] = BaseEndpoints.HEARING.value
 

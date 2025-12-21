@@ -4,6 +4,7 @@ from dataclasses import asdict as dc_to_dict
 from dataclasses import dataclass, field, is_dataclass
 from datetime import datetime
 from typing import ClassVar
+
 import humps
 from pyspark.sql import Row
 
@@ -44,9 +45,9 @@ class Pagination:
     count: int
     next: str | None = None
 
+
 @dataclass
 class CongressResponseBase(JsonSerializable):
-
     json_key: ClassVar[str | None] = field(default=None, init=False, repr=False)
 
     def to_row(self) -> Row:
@@ -61,5 +62,3 @@ class CongressResponseBase(JsonSerializable):
                 continue
         msg = f"passed {str_ts} does not conform to expected ts formats."
         raise ValueError(msg)
-    
-

@@ -52,9 +52,9 @@ class CongressV3Client:
 
         """
         return HearingAPI(api_key=self._api_key)
-    
+
     @cached_property
-    def member(self) -> 'MemberAPI':
+    def member(self) -> "MemberAPI":
         """
         Provides access to the MemberAPI.
 

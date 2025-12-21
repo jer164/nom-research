@@ -15,6 +15,7 @@ from cong.models.member import (
     LegislationInfo,
 )
 
+
 @pytest.fixture
 def member_fixture():
     return Member(
@@ -67,11 +68,7 @@ def member_detail_fixture():
         last_name="Dunn",
         middle_name="P.",
         official_website_url="https://dunn.house.gov",
-        party_history=[
-            PartyHistory(
-                party_abbreviation="R", party_name="Republican", start_year=2017
-            )
-        ],
+        party_history=[PartyHistory(party_abbreviation="R", party_name="Republican", start_year=2017)],
         previous_names=[
             PreviousName(
                 direct_order_name="Neal P. Dunn",

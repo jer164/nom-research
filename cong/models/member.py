@@ -1,6 +1,6 @@
-from dataclasses import dataclass, field, fields
-from typing import ClassVar
+from dataclasses import dataclass, field
 from datetime import datetime
+from typing import ClassVar
 
 from cong.models.congress_base import CongressResponseBase, JsonSerializable
 
@@ -16,8 +16,8 @@ class Term(JsonSerializable):
     chamber: str
     start_year: int | None = None
     end_year: int | None = None
-    start: int | None = None
-    end: int | None = None
+    # start: int | None = None
+    # end: int | None = None
 
 
 @dataclass
@@ -30,15 +30,6 @@ class DetailedTerm(JsonSerializable):
     state_name: str
     district: int | None = None
     end_year: int | None = None
-
-
-@dataclass
-class Terms(JsonSerializable):
-    item: list[Term | DetailedTerm] = field(default_factory=list)
-
-    def __post_init__(self):
-        if self.item and isinstance(self.item, list) and isinstance(self.item[0], dict):
-            self.item = [Term(**t) for t in self.item]
 
 
 @dataclass
@@ -81,7 +72,7 @@ class Member(CongressResponseBase):
     name: str
     party_name: str
     state: str
-    terms: Terms
+    terms: list[Term]
     update_date: datetime
     url: str
     depiction: Depiction | None = None
@@ -93,9 +84,9 @@ class Member(CongressResponseBase):
         if isinstance(self.update_date, str):
             self.update_date = self.format_ts(self.update_date)
         if self.depiction is not None and isinstance(self.depiction, dict):
-            self.depiction = Depiction.from_json(self.depiction)
+            self.depiction = Depiction.from_json(self.depiction) # type: ignore
         if isinstance(self.terms, dict):
-            self.terms = Terms.from_json(self.terms)
+            self.terms = [Term.from_json(t) for t in self.terms["item"]] # type: ignore
 
 
 @dataclass
@@ -126,35 +117,26 @@ class MemberDetail(CongressResponseBase):
     ## TODO: Refactor __post_init__ to reduce repetition across the codebase
     ## Likely need to make a utility function in congress_base.py to handle this pattern
     def __post_init__(self):
-
         if isinstance(self.update_date, str):
             self.update_date = self.format_ts(self.update_date)
 
         if isinstance(self.address_information, dict):
-            self.address_information = AddressInformation.from_json(
-                self.address_information
-            )
+            self.address_information = AddressInformation.from_json(self.address_information)
 
         if isinstance(self.depiction, dict):
             self.depiction = Depiction.from_json(self.depiction)
 
         if isinstance(self.cosponsored_legislation, dict):
-            self.cosponsored_legislation = LegislationInfo.from_json(
-                self.cosponsored_legislation
-            )
+            self.cosponsored_legislation = LegislationInfo.from_json(self.cosponsored_legislation)
 
         if isinstance(self.sponsored_legislation, dict):
-            self.sponsored_legislation = LegislationInfo.from_json(
-                self.sponsored_legislation
-            )
+            self.sponsored_legislation = LegislationInfo.from_json(self.sponsored_legislation)
 
         if self.party_history and isinstance(self.party_history[0], dict):
             self.party_history = [PartyHistory.from_json(p) for p in self.party_history]
 
         if self.previous_names and isinstance(self.previous_names[0], dict):
-            self.previous_names = [
-                PreviousName.from_json(p) for p in self.previous_names
-            ]
+            self.previous_names = [PreviousName.from_json(p) for p in self.previous_names]
 
         if self.terms and isinstance(self.terms[0], dict):
             self.terms = [DetailedTerm.from_json(t) for t in self.terms]
@@ -185,9 +167,7 @@ class SponsoredLegislation(CongressResponseBase):
     number: str | None = None
     amendment_number: str | None = None
 
-    json_key: ClassVar[str] = field(
-        default="sponsoredLegislation", init=False, repr=False
-    )
+    json_key: ClassVar[str] = field(default="sponsoredLegislation", init=False, repr=False)
 
     def __post_init__(self):
         if isinstance(self.latest_action, dict):
@@ -198,6 +178,4 @@ class SponsoredLegislation(CongressResponseBase):
 
 @dataclass
 class CosponsoredLegislation(SponsoredLegislation):
-    json_key: ClassVar[str] = field(
-        default="cosponsoredLegislation", init=False, repr=False
-    )
+    json_key: ClassVar[str] = field(default="cosponsoredLegislation", init=False, repr=False)
