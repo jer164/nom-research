@@ -6,11 +6,8 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "grequests>=0.7.0",
-    "pandas>=2.3.3",
     "pdoc>=15.0.1",
     "pyhumps>=3.8.0",
-    "pyspark==4",
-    "pytest>=9.0.2",
     "python-dotenv>=1.0.1",
     "pytz>=2025.1",
     "requests>=2.32.3",
@@ -18,8 +15,13 @@ dependencies = [
 ]
 
 [dependency-groups]
+analysis-tools = [
+    "pandas>=2.3.3",
+    "pyspark==4",
+]
 dev = [
     "ipykernel>=6.29.5",
+    "pytest>=9.0.2",
 ]
 
 [tool.pyright]
@@ -31,7 +33,6 @@ target-version = "py311"
 lint.select = [
     "ALL", # include all the rules, including new ones
 ]
-exclude  = ["scratchpad.ipynb", "testing.ipynb"]
 lint.ignore = [
     #### modules
     "ANN", # flake8-annotations
@@ -65,6 +66,7 @@ lint.ignore = [
     "TD003",
     "FIX002", # too verbose descriptions of todos
 ]
+exclude  = ["scratchpad.ipynb", "testing.ipynb"]
 [tool.ruff.format]
 docstring-code-format = true
 docstring-code-line-length = 20
