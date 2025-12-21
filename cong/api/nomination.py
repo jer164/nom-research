@@ -1,9 +1,8 @@
 from datetime import datetime
 from typing import ClassVar
 
-
-from cong.api.api import HasSubDirectories, CongressAPI
-from cong.models.hearing import HearingFromNomination, DetailedHearing, Hearing
+from cong.api.api import CongressAPI, HasSubDirectories
+from cong.models.hearing import HearingFromNomination
 from cong.models.nomination import Nomination
 from cong.statics import BaseEndpoints
 

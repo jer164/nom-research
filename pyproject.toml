@@ -6,32 +6,36 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "grequests>=0.7.0",
-    "pandas>=2.3.3",
     "pdoc>=15.0.1",
+    "pip>=25.3",
     "pyhumps>=3.8.0",
-    "pyspark==4",
-    "pytest>=9.0.2",
     "python-dotenv>=1.0.1",
     "pytz>=2025.1",
     "requests>=2.32.3",
+    "ruff>=0.14.10",
     "us>=3.2.0",
 ]
 
 [dependency-groups]
+analysis-tools = [
+    "pandas>=2.3.3",
+    "pyspark==4",
+]
 dev = [
     "ipykernel>=6.29.5",
+    "pre-commit>=4.5.1",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
 ]
 
 [tool.pyright]
 typeCheckingMode = "off"
 
 [tool.ruff]
-line-length = 120
-target-version = "py311"
+lint.fixable = ["ALL"]
 lint.select = [
     "ALL", # include all the rules, including new ones
 ]
-exclude  = ["scratchpad.ipynb", "testing.ipynb"]
 lint.ignore = [
     #### modules
     "ANN", # flake8-annotations
@@ -64,7 +68,13 @@ lint.ignore = [
     "TD002",
     "TD003",
     "FIX002", # too verbose descriptions of todos
+    "FBT001", # need booleans in query params, will fix later
+    "FBT002", 
+    "PLR0913" # too many arguments in some functions
 ]
+line-length = 120
+target-version = "py311"
+include = ["cong/**/*.py"]
 [tool.ruff.format]
 docstring-code-format = true
 docstring-code-line-length = 20
