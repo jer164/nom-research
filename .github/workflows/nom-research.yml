@@ -28,7 +28,7 @@ jobs:
         enable-cache: true
 
     - name: Install project
-      run: uv sync --locked --dev
+      run: uv sync --locked --dev --all-extras
     
     - name: Run ruff format
       uses: astral-sh/ruff-action@v3
