@@ -4,11 +4,9 @@
 name: nom-research
 
 on: [pull_request]
-on: [pull_request]
 
 jobs:
   build:
-    name: python
     name: python
     runs-on: ubuntu-latest
 
@@ -32,7 +30,6 @@ jobs:
 
     - name: Install project
       run: uv sync --locked --all-groups
-      run: uv sync --locked --all-groups
     
     - name: Run ruff format
       uses: astral-sh/ruff-action@v3
@@ -47,5 +44,4 @@ jobs:
         args: check --fix --show-fixes
         
     - name: Test with pytest
-      run: uv run pytest -vv --cov=cong
       run: uv run pytest -vv --cov=cong
