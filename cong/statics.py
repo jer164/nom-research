@@ -27,7 +27,7 @@ class BaseEndpoints(Enum):
     BILL = f"{URL_BASE}/bill"
     AMENDMENTS = f"{URL_BASE}/amendment"
     SUMMARIES = f"{URL_BASE}/summaries"
-    COMGRESS = f"{URL_BASE}/congress"
+    CONGRESS = f"{URL_BASE}/congress"
     MEMBER = f"{URL_BASE}/member"
     COMMITTEE = f"{URL_BASE}/committee"
     COMMITTEE_REPORT = f"{URL_BASE}/committee-report"
