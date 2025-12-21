@@ -88,7 +88,27 @@ class HearingAPI(CongressAPI, HasSubDirectories):
             return_type=DetailedHearing,
         )
     
+    def get_details_from_hearings(self, hearings: list[Hearing]) -> list[DetailedHearing]:
+        """
+        Retrieve detailed information for a list of hearings.
 
+        Args:
+            hearings (list[Hearing]): A list of Hearing objects for which to retrieve details.
+        Returns:
+            list[DetailedHearing]: A list of DetailedHearing objects with detailed information.
+        """
+        base_urls = [self.build_url_from_values(hearing.congress, hearing.chamber.lower(), hearing.jacket_number) for hearing in hearings]
+        request_list = [
+            {
+                "url": base_url,
+                "params": self.build_params(),
+            }
+            for base_url in base_urls
+        ]
+        return self._fetch_async(
+            request_list=request_list,
+            return_type=DetailedHearing,
+        )
 
     def get_detailed_hearing_by_jacket_number(
         self, congress: int, chamber: str, jacket_number: int, offset: int = 0, limit: int = 100
