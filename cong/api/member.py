@@ -7,6 +7,9 @@ from cong.api.api import HasSubDirectories, CongressAPI
 from cong.models.member import Member, MemberDetail, SponsoredLegislation, CosponsoredLegislation
 from cong.statics import BaseEndpoints
 
+# Maximum valid U.S. Congressional district number
+MAX_DISTRICT_NUMBER = 52
+
 
 class MemberAPI(CongressAPI, HasSubDirectories):
     """
@@ -190,8 +193,8 @@ class MemberAPI(CongressAPI, HasSubDirectories):
         Returns:
             list[Member]: The list of Members from the specified state and district.
         """
-        if district > 52 or district < 0:
-            raise ValueError("Invalid district number. Must be between 0 and 52.")
+        if district > MAX_DISTRICT_NUMBER or district < 0:
+            raise ValueError(f"Invalid district number. Must be between 0 and {MAX_DISTRICT_NUMBER}.")
         state_code = states.lookup(state).abbr
         return self._fetch(
             self.build_url_from_values(state_code, district),
@@ -212,8 +215,8 @@ class MemberAPI(CongressAPI, HasSubDirectories):
         Returns:
             list[Member]: The list of Members from the specified congress, state and district.
         """
-        if district > 52 or district < 0:
-            raise ValueError("Invalid district number. Must be between 0 and 52.")
+        if district > MAX_DISTRICT_NUMBER or district < 0:
+            raise ValueError(f"Invalid district number. Must be between 0 and {MAX_DISTRICT_NUMBER}.")
         state_code = states.lookup(state).abbr
         return self._fetch(
             self.build_url_from_values("congress", congress, state_code, district),
