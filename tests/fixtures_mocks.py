@@ -12,7 +12,6 @@ from cong.models.member import (
     PartyHistory,
     PreviousName,
     Term,
-    Terms,
 )
 
 

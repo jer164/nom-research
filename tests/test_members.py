@@ -4,7 +4,7 @@ import pytest
 
 from cong.api.member import MemberAPI
 from cong.models.member import MemberDetail
-from tests.fixtures_mocks import member_fixture
+from tests.fixtures_mocks import member_fixture, member_detail_fixture
 
 
 @pytest.fixture
