@@ -32,7 +32,7 @@ class TestMemberAPI:
     @patch.object(MemberAPI, "_get_all_members")
     def test_get_members_retrieve_all(self, mock_get_all, member_api):
         mock_get_all.return_value = [member_fixture]
-        result = member_api.get_members(retrive_all=True)
+        result = member_api.get_members(retrieve_all=True)
 
         mock_get_all.assert_called_once()
         assert len(result) == 1
@@ -55,7 +55,7 @@ class TestMemberAPI:
         mock_build.return_value = ["url1", "url2"]
         mock_fetch_async.return_value = [member_fixture]
 
-        result = member_api.get_members_by_congress(congress=117, retrive_all=True)
+        result = member_api.get_members_by_congress(congress=117, retrieve_all=True)
 
         mock_fetch_async.assert_called_once()
         assert len(result) == 1
