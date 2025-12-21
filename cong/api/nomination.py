@@ -143,7 +143,7 @@ class NominationAPI(CongressAPI, HasSubDirectories):
             }
             for base_url in base_urls
         ]
-        print(request_list)
+        self.logger.debug(request_list)
         return self._fetch_async(
             request_list,
             return_type=HearingFromNomination,
