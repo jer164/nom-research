@@ -103,10 +103,7 @@ class MemberAPI(CongressAPI, HasSubDirectories):
                 max_rows,
                 currentMember=current_member,
             )
-            return self._fetch_async(
-                async_urls,
-                return_type=Member,
-            )
+            return self._fetch_async(async_urls, return_type=Member, sort_key="name")
         # else just get with pagination optional
         return self._fetch(
             self.build_url_from_values("congress", congress),
@@ -286,4 +283,5 @@ class MemberAPI(CongressAPI, HasSubDirectories):
         return self._fetch_async(
             async_urls,
             return_type=Member,
+            sort_key="name",
         )

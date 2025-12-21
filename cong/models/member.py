@@ -1,8 +1,15 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import ClassVar
+from enum import Enum
 
 from cong.models.congress_base import CongressResponseBase, JsonSerializable
+
+
+class Chamber(Enum):
+    HOUSE = "House"
+    SENATE = "Senate"
+    NO_CHAMBER = "NoChamber"
 
 
 @dataclass
@@ -13,14 +20,17 @@ class Depiction(JsonSerializable):
 
 @dataclass
 class Term(JsonSerializable):
-    chamber: str
+    chamber: Chamber
     start_year: int | None = None
     end_year: int | None = None
+
+    def __post_init__(self):
+        self.chamber = Chamber(self.chamber)
 
 
 @dataclass
 class DetailedTerm(JsonSerializable):
-    chamber: str
+    chamber: Chamber
     congress: int
     member_type: str
     start_year: int
@@ -28,6 +38,9 @@ class DetailedTerm(JsonSerializable):
     state_name: str
     district: int | None = None
     end_year: int | None = None
+
+    def __post_init__(self):
+        self.chamber = Chamber(self.chamber)
 
 
 @dataclass

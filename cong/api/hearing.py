@@ -86,7 +86,7 @@ class HearingAPI(CongressAPI, HasSubDirectories):
 
         """
         return self._fetch(
-            self.build_url_from_values(hearing.congress, hearing.chamber.lower(), hearing.jacket_number),
+            self.build_url_from_values(hearing.congress, hearing.chamber.value.lower(), hearing.jacket_number),
             return_type=DetailedHearing,
         )
 
@@ -101,19 +101,15 @@ class HearingAPI(CongressAPI, HasSubDirectories):
             list[DetailedHearing]: A list of DetailedHearing objects with detailed information.
 
         """
+
         base_urls = [
-            self.build_url_from_values(hearing.congress, hearing.chamber.lower(), hearing.jacket_number)
+            self.build_url_from_values(hearing.congress, hearing.chamber.value.lower(), hearing.jacket_number)
             for hearing in hearings
         ]
-        request_list = [
-            {
-                "url": base_url,
-                "params": self.build_params(),
-            }
-            for base_url in base_urls
-        ]
+        async_urls = [req for base_url in base_urls for req in self._build_async_requests(base_url, max_row_count=1)]
         return self._fetch_async(
-            request_list=request_list,
+            request_list=async_urls,
+            sort_key="jacket_number",
             return_type=DetailedHearing,
         )
 
@@ -161,6 +157,7 @@ class HearingAPI(CongressAPI, HasSubDirectories):
         return self._fetch_async(
             [self.build_url_from_values(congress, chamber.lower(), jacket) for jacket in jacket_numbers],
             return_type=DetailedHearing,
+            sort_key="jacket_number",
             offset=offset,
             limit=limit,
         )

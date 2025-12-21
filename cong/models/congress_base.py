@@ -4,10 +4,12 @@ from dataclasses import asdict as dc_to_dict
 from dataclasses import dataclass, field, is_dataclass
 from datetime import datetime
 from typing import ClassVar
+from enum import Enum
 
 import humps
 from pyspark.sql import Row
 
+from cong.helpers import parse_enum_for_row
 from cong.statics import EST_TZ
 
 
@@ -51,7 +53,11 @@ class CongressResponseBase(JsonSerializable):
     json_key: ClassVar[str | None] = field(default=None, init=False, repr=False)
 
     def to_row(self) -> Row:
-        return Row(**self.to_json())
+        as_json = self.to_json()
+        for key, value in as_json.items():
+            if isinstance(value, Enum):
+                as_json[key] = parse_enum_for_row(value)
+        return Row(**as_json)
 
     def format_ts(self, str_ts: str) -> datetime:
         valid_ts = ["%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%d"]

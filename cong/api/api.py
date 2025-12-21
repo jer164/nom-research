@@ -171,7 +171,7 @@ class CongressAPI:
         return self._parse_response(data, return_type)
 
     def _fetch_async(
-        self, request_list: list[dict], return_type: CongressResponseBase, **kwargs
+        self, request_list: list[dict], return_type: CongressResponseBase, sort_key: str | None = None, **kwargs
     ) -> list[CongressResponseBase]:
         """
         Fetches data from the specified URL.
@@ -190,4 +190,8 @@ class CongressAPI:
         data = self._get_async(request_list=request_list, **kwargs)
         nested_resp = [self._parse_response(d, return_type) for d in data]
         self.logger.info("All requests successful; returned %d records.", sum(len(r) for r in nested_resp))
-        return list(itertools.chain(*nested_resp))
+        return (
+            list(itertools.chain(*nested_resp))
+            if sort_key is None
+            else sorted(itertools.chain(*nested_resp), key=lambda x: getattr(x, sort_key))
+        )
