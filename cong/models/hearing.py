@@ -5,8 +5,8 @@ from typing import ClassVar
 import requests
 
 from cong.models.congress_base import CongressResponseBase, JsonSerializable
-from cong.models.nomination import Committee
 from cong.models.member import Chamber
+from cong.models.nomination import Committee
 from cong.statics import EST_TZ
 
 
@@ -31,9 +31,7 @@ class Hearing(CongressResponseBase):
     def __post_init__(self):
         self.chamber = Chamber(self.chamber)
         if isinstance(self.update_date, str):
-            self.update_date = datetime.strptime(
-                self.update_date, "%Y-%m-%dT%H:%M:%SZ"
-            ).astimezone(EST_TZ)
+            self.update_date = datetime.strptime(self.update_date, "%Y-%m-%dT%H:%M:%SZ").astimezone(EST_TZ)
 
 
 @dataclass
@@ -72,9 +70,7 @@ class DetailedHearing(CongressResponseBase):
     committees: list[Committee] = field(default_factory=list)
     number: int | None = None  ### this may not exist
     dates: list[dict[str, datetime]] = field(default_factory=list)
-    associated_meeting: AssociatedMeeting = field(
-        default_factory=lambda: AssociatedMeeting(event_id=None, url=None)
-    )
+    associated_meeting: AssociatedMeeting = field(default_factory=lambda: AssociatedMeeting(event_id=None, url=None))
 
     json_key: ClassVar[str] = field(default="hearing", init=False, repr=False)
 
@@ -82,26 +78,17 @@ class DetailedHearing(CongressResponseBase):
         self.chamber = Chamber(self.chamber)
         self.formats = [HearingTranscript(**f) for f in self.formats]
         if isinstance(self.dates, list):
-            self.dates = [
-                {"date": datetime.strptime(d["date"], "%Y-%m-%d").astimezone(EST_TZ)}
-                for d in self.dates
-            ]
+            self.dates = [{"date": datetime.strptime(d["date"], "%Y-%m-%d").astimezone(EST_TZ)} for d in self.dates]
         if isinstance(self.update_date, str):
-            self.update_date = datetime.strptime(
-                self.update_date, "%Y-%m-%dT%H:%M:%SZ"
-            ).astimezone(EST_TZ)
+            self.update_date = datetime.strptime(self.update_date, "%Y-%m-%dT%H:%M:%SZ").astimezone(EST_TZ)
         if isinstance(self.associated_meeting, dict):
-            self.associated_meeting = AssociatedMeeting.from_json(
-                self.associated_meeting
-            )
+            self.associated_meeting = AssociatedMeeting.from_json(self.associated_meeting)
         if isinstance(self.committees, list):
             self.committees = [Committee.from_json(c) for c in self.committees]
 
     @property
     def hearing_text(self) -> str:
-        txt_url = next(
-            (t.url for t in self.formats if t.type == "Formatted Text"), None
-        )
+        txt_url = next((t.url for t in self.formats if t.type == "Formatted Text"), None)
         if txt_url is not None:
             response = requests.get(txt_url, timeout=200)
             response.raise_for_status()

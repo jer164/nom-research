@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import ClassVar
 from enum import Enum
+from typing import ClassVar
 
 from cong.models.congress_base import CongressResponseBase, JsonSerializable
-from cong.models.member import LatestAction, Chamber
+from cong.models.member import Chamber, LatestAction
 from cong.statics import EST_TZ
 
 
@@ -12,6 +12,8 @@ class ActionType(Enum):
     COMMITTEE = "Committee"
     REFERRAL = "IntroReferral"
     FLOOR = "Floor"
+    CALENDARS = "Calendars"
+    DISCHARGE = "Discharge"
 
 
 class NominationType(Enum):
@@ -20,7 +22,7 @@ class NominationType(Enum):
     UNKNOWN = "Unknown"
 
     @classmethod
-    def _from_dict_key(cls, data: dict) -> "NominationType":
+    def from_dict_key(cls, data: dict) -> "NominationType":
         key_mapping = {"is_civilian": cls.CIVILIAN, "is_military": cls.MILITARY}
         return key_mapping.get(next(iter(data), None), cls.UNKNOWN)
 
@@ -108,8 +110,9 @@ class NomineeSummary(JsonSerializable):
     nominee_count: int
     ordinal: int
     organization: str
-    position_title: str
     url: str
+    position_title: str = field(default=None)
+    intro_text: str = field(default="no intro text")
 
 
 @dataclass
@@ -136,7 +139,7 @@ class Nomination(CongressResponseBase):
             else self.update_date
         )
         if isinstance(self.nomination_type, dict):
-            self.nomination_type = NominationType._from_dict_key(self.nomination_type)
+            self.nomination_type = NominationType.from_dict_key(self.nomination_type)
         if isinstance(self.latest_action, dict):
             self.latest_action = LatestAction.from_json(self.latest_action)
 
@@ -151,27 +154,32 @@ class Nomination(CongressResponseBase):
 
 @dataclass
 class DetailedNomination(CongressResponseBase):
-    actions: ActionSummary
-    authority_date: str
-    citation: str
-    committees: CommitteeSummary
-    congress: int
-    hearings: HearingSummary
-    nomination_type: NominationType
-    nominees: NomineeSummary
-    number: int
-    part_number: str
-    update_date: datetime
-    latest_action: LatestAction
+    actions: ActionSummary = field(default=None)
+    authority_date: str = field(default=None)
+    citation: str = field(default=None)
+    committees: CommitteeSummary = field(default=None)
+    congress: int = field(default=None)
+    hearings: HearingSummary = field(default=None)
+    nomination_type: NominationType = field(default=None)
+    nominees: NomineeSummary = field(default=None)
+    number: int = field(default=None)
+    part_number: str = field(default=None)
+    update_date: datetime = field(default=None)
+    latest_action: LatestAction = field(default=None)
+    is_list: bool = field(default=False)
+    is_privileged: bool = field(default=False)
     received_date: datetime | None = field(default_factory=str)
     description: str = field(default="no description")
+    executive_calendar_number: str = field(default=None)
 
     json_key: ClassVar[str] = field(default="nomination", init=False, repr=False)
 
     def __post_init__(self):
         self.update_date = datetime.strptime(self.update_date, "%Y-%m-%dT%H:%M:%SZ").astimezone(EST_TZ)
         self.received_date = datetime.strptime(self.received_date, "%Y-%m-%d").astimezone(EST_TZ)
-        self.authority_date = datetime.strptime(self.authority_date, "%Y-%m-%d").astimezone(EST_TZ)
+        self.authority_date = (
+            datetime.strptime(self.authority_date, "%Y-%m-%d").astimezone(EST_TZ) if self.authority_date else None
+        )
         if isinstance(self.actions, dict):
             self.actions = ActionSummary.from_json(self.actions)
         if isinstance(self.latest_action, dict):
@@ -179,7 +187,7 @@ class DetailedNomination(CongressResponseBase):
         if isinstance(self.nominees, list):
             self.nominees = [NomineeSummary.from_json(nominee) for nominee in self.nominees]
         if isinstance(self.nomination_type, dict):
-            self.nomination_type = NominationType._from_dict_key(self.nomination_type)
+            self.nomination_type = NominationType.from_dict_key(self.nomination_type)
         if isinstance(self.committees, dict):
             self.committees = CommitteeSummary.from_json(self.committees)
         if isinstance(self.hearings, dict):

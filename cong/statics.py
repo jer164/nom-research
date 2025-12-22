@@ -7,6 +7,8 @@ EST_TZ = pytz.timezone("US/Eastern")
 
 URL_BASE = "https://api.congress.gov/v3"
 
+SUCCESS_STATUS = 200
+
 
 def log_template(name: str):
     logger = logging.getLogger(name)

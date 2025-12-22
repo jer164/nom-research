@@ -101,7 +101,6 @@ class HearingAPI(CongressAPI, HasSubDirectories):
             list[DetailedHearing]: A list of DetailedHearing objects with detailed information.
 
         """
-
         base_urls = [
             self.build_url_from_values(hearing.congress, hearing.chamber.value.lower(), hearing.jacket_number)
             for hearing in hearings

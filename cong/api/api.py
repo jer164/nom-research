@@ -8,7 +8,7 @@ import grequests
 import pytz
 import requests
 
-from cong.statics import log_template
+from cong.statics import SUCCESS_STATUS, log_template
 
 if TYPE_CHECKING:
     from cong.models.congress_base import CongressResponseBase
@@ -143,9 +143,15 @@ class CongressAPI:
         return async_requests  ### need to make this its own object probably
 
     def _get_async(self, request_list: list[dict]) -> list[dict]:
+        responses = []
         rs = (grequests.get(url=req["url"], params=req["params"], timeout=30) for req in request_list)
-        reqs = grequests.map(rs, size=25)
-        return [r.json() for r in reqs]
+        reqs = grequests.map(rs, size=50)
+        for r in reqs:
+            if r.status_code != SUCCESS_STATUS:
+                r.raise_for_status()
+            else:
+                responses.append(r.json())
+        return responses
 
     def _parse_response(self, data: dict, return_type: CongressResponseBase) -> list:
         if isinstance(data[return_type.json_key], list):
@@ -167,7 +173,10 @@ class CongressAPI:
         """
         self.logger.info("Sending request...")
         data = self._get(url, **kwargs)
-        self.logger.info("Request successful; returned %d records.", len(data[return_type.json_key]))
+        response_size = len(data[return_type.json_key]) if isinstance(data[return_type.json_key], list) else 1
+        self.logger.info(
+            "Request successful; returned %d %s.", response_size, "record" if response_size == 1 else "records"
+        )
         return self._parse_response(data, return_type)
 
     def _fetch_async(
@@ -179,13 +188,14 @@ class CongressAPI:
         Args:
             request_list (list[dict]): The list of requests to send.
             return_type (CongressResponseBase): The type of response expected from the query.
+            sort_key (str | None): The key to sort the results by.
             **kwargs: Additional parameters for the request.
 
         Returns:
             list: The processed response data.
 
         """
-        self.logger.info("Sending %d requests in parallel.", len(request_list))
+        self.logger.info("Sending %d batches of 50 parallel requests", len(request_list) // 50 + 1)
         self.logger.info("Session may timeout if token encounters rate limits.")
         data = self._get_async(request_list=request_list, **kwargs)
         nested_resp = [self._parse_response(d, return_type) for d in data]

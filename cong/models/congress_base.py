@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import asdict as dc_to_dict
 from dataclasses import dataclass, field, is_dataclass
 from datetime import datetime
-from typing import ClassVar
 from enum import Enum
+from typing import ClassVar
 
 import humps
 from pyspark.sql import Row

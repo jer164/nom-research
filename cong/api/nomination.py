@@ -2,8 +2,9 @@ from datetime import datetime
 from typing import ClassVar
 
 from cong.api.api import CongressAPI, HasSubDirectories
+from cong.helpers import unofficial_method
 from cong.models.hearing import HearingFromNomination
-from cong.models.nomination import Nomination, Nominee, DetailedNomination, NomineeAction, DetailedCommittee
+from cong.models.nomination import DetailedCommittee, DetailedNomination, Nomination, Nominee, NomineeAction
 from cong.statics import BaseEndpoints
 
 
@@ -76,6 +77,7 @@ class NominationAPI(CongressAPI, HasSubDirectories):
             from_date (datetime | str | None): The start date for filtering results.
             to_date (datetime | str | None): The end date for filtering results.
             limit (int): The maximum number of results to return.
+            retrieve_all (bool): Whether to retrieve all results asynchronously.
 
         Returns:
             list[Nomination]: The list of nominations.
@@ -106,10 +108,12 @@ class NominationAPI(CongressAPI, HasSubDirectories):
     def get_detail_from_nomination(self, nomination: Nomination, offset: int = 0, limit: int = 100) -> Nomination:
         """
         Fetches detailed nomination information for a given nomination from the API.
+
         Args:
             nomination (Nomination): The Nomination object.
             offset (int): The offset for pagination.
             limit (int): The maximum number of results to return.
+
         Returns:
             DetailedNomination: The detailed nomination information.
 
@@ -119,6 +123,28 @@ class NominationAPI(CongressAPI, HasSubDirectories):
             return_type=DetailedNomination,
             offset=offset,
             limit=limit,
+        )
+
+    @unofficial_method
+    def get_details_from_list_of_nominations(
+        self,
+        nominations: list[Nomination],
+    ) -> list[DetailedNomination]:
+        """
+        Fetches detailed nomination information for a list of nominations from the API.
+
+        Args:
+            nominations (list[Nomination]): The list of Nomination objects.
+
+        Returns:
+            list[DetailedNomination]: The list of detailed nomination information.
+
+        """
+        base_urls = [self.build_url_from_values(nom.congress, nom.number) for nom in nominations]
+        async_urls = [req for base_url in base_urls for req in self._build_async_requests(base_url, max_row_count=1)]
+        return self._fetch_async(
+            async_urls,
+            return_type=DetailedNomination,
         )
 
     def get_hearings_from_nomination_number(
@@ -136,6 +162,7 @@ class NominationAPI(CongressAPI, HasSubDirectories):
             nomination_no (int): Nomination number.
             offset (int): The offset for pagination.
             limit (int): The maximum number of results to return.
+
         Returns:
             list[Nomination]: The list of nominations.
 
@@ -161,10 +188,12 @@ class NominationAPI(CongressAPI, HasSubDirectories):
 
         Args:
             nomination (Nomination): The Nomination object.
+            ordinal (int): The ordinal number of the nominee.
             offset (int): The offset for pagination.
             limit (int): The maximum number of results to return.
+
         Returns:
-            list[Nomination]: The list of nominations.
+            list[Nominee]: The list of nominees.
 
         """
         resp = self._fetch(
@@ -190,6 +219,7 @@ class NominationAPI(CongressAPI, HasSubDirectories):
             nomination (Nomination): The Nomination object.
             offset (int): The offset for pagination.
             limit (int): The maximum number of results to return.
+
         Returns:
             list[NomineeAction]: The list of nominee actions.
 
@@ -199,6 +229,28 @@ class NominationAPI(CongressAPI, HasSubDirectories):
             return_type=NomineeAction,
             offset=offset,
             limit=limit,
+        )
+
+    @unofficial_method
+    def get_actions_from_list_of_nominations(
+        self,
+        nominations: list[Nomination],
+    ) -> list[NomineeAction]:
+        """
+        Fetches nominee actions for a list of nominations from the API.
+
+        Args:
+            nominations (list[Nomination]): The list of Nomination objects.
+
+        Returns:
+            list[NomineeAction]: The list of nominee actions.
+
+        """
+        base_urls = [self.build_url_from_values(nom.congress, nom.number, "actions") for nom in nominations]
+        async_urls = [req for base_url in base_urls for req in self._build_async_requests(base_url, max_row_count=1)]
+        return self._fetch_async(
+            async_urls,
+            return_type=NomineeAction,
         )
 
     def get_committees_from_nomination(
@@ -214,6 +266,7 @@ class NominationAPI(CongressAPI, HasSubDirectories):
             nomination (Nomination): The Nomination object.
             offset (int): The offset for pagination.
             limit (int): The maximum number of results to return.
+
         Returns:
             list[DetailedCommittee]: The list of committees.
 
@@ -250,7 +303,7 @@ class NominationAPI(CongressAPI, HasSubDirectories):
             limit=limit,
         )
 
-    ### TODO: needs to use better async params
+    @unofficial_method
     def get_hearings_from_list_of_nominations(
         self,
         nominations: list[Nomination],
@@ -269,14 +322,8 @@ class NominationAPI(CongressAPI, HasSubDirectories):
 
         """
         base_urls = [self.build_url_from_values(nom.congress, nom.number, "hearings") for nom in nominations]
-        request_list = [
-            {
-                "url": base_url,
-                "params": self.build_params(),
-            }
-            for base_url in base_urls
-        ]
+        async_urls = [req for base_url in base_urls for req in self._build_async_requests(base_url, max_row_count=1)]
         return self._fetch_async(
-            request_list,
+            async_urls,
             return_type=HearingFromNomination,
         )
